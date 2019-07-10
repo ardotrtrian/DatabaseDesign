@@ -1,0 +1,121 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema school
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema school
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `school` DEFAULT CHARACTER SET utf8 ;
+USE `school` ;
+
+-- -----------------------------------------------------
+-- Table `school`.`instructors`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`instructors` (
+  `Id` SMALLINT(6) NOT NULL AUTO_INCREMENT,
+  `FirstName` VARCHAR(45) NOT NULL,
+  `LastName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `school`.`courses`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`courses` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Title` VARCHAR(255) NOT NULL,
+  `Price` DECIMAL(5,2) NOT NULL,
+  `InstructorId` SMALLINT(6) NOT NULL,
+  PRIMARY KEY (`Id`),
+  INDEX `fk_Courses_Instructors1_idx` (`InstructorId` ASC) VISIBLE,
+  CONSTRAINT `fk_Courses_Instructors1`
+    FOREIGN KEY (`InstructorId`)
+    REFERENCES `school`.`instructors` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `school`.`tags`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`tags` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `school`.`coursetags`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`coursetags` (
+  `CourseId` INT(11) NOT NULL,
+  `TagId` INT(11) NOT NULL,
+  PRIMARY KEY (`CourseId`, `TagId`),
+  INDEX `fk_Links_Courses1_idx` (`CourseId` ASC) VISIBLE,
+  INDEX `fk_Links_Tags1_idx` (`TagId` ASC) VISIBLE,
+  CONSTRAINT `fk_Links_Courses1`
+    FOREIGN KEY (`CourseId`)
+    REFERENCES `school`.`courses` (`Id`),
+  CONSTRAINT `fk_Links_Tags1`
+    FOREIGN KEY (`TagId`)
+    REFERENCES `school`.`tags` (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `school`.`students`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`students` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `FirstName` VARCHAR(50) NOT NULL,
+  `LastName` VARCHAR(45) NOT NULL,
+  `Email` VARCHAR(255) NOT NULL,
+  `DateRegistered` DATETIME NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `school`.`enrollment`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `school`.`enrollment` (
+  `StudentId` INT(11) NOT NULL,
+  `CourseId` INT(11) NOT NULL,
+  `Date` DATETIME NOT NULL,
+  `Price` DECIMAL(5,2) NOT NULL,
+  PRIMARY KEY (`StudentId`, `CourseId`),
+  INDEX `fk_Enrollement_Students_idx` (`StudentId` ASC) VISIBLE,
+  INDEX `fk_Enrollement_Courses1_idx` (`CourseId` ASC) VISIBLE,
+  CONSTRAINT `fk_Enrollement_Courses1`
+    FOREIGN KEY (`CourseId`)
+    REFERENCES `school`.`courses` (`Id`)
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Enrollement_Students`
+    FOREIGN KEY (`StudentId`)
+    REFERENCES `school`.`students` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
