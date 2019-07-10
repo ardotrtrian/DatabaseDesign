@@ -1,0 +1,155 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema flightbookingsystem
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema flightbookingsystem
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `flightbookingsystem` DEFAULT CHARACTER SET utf8 ;
+USE `flightbookingsystem` ;
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`airlines`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`airlines` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`airportlocation`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`airportlocation` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `City` VARCHAR(45) NOT NULL,
+  `State` VARCHAR(45) NOT NULL,
+  `Country` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`airports`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`airports` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `IATAcode` VARCHAR(45) NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  `AirportLocationId` INT(11) NOT NULL,
+  PRIMARY KEY (`Id`),
+  INDEX `fk_Airports_AirportLocation1_idx` (`AirportLocationId` ASC) VISIBLE,
+  CONSTRAINT `fk_Airports_AirportLocation1`
+    FOREIGN KEY (`AirportLocationId`)
+    REFERENCES `flightbookingsystem`.`airportlocation` (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`flightclasses`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`flightclasses` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`flights`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`flights` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Number` VARCHAR(45) NOT NULL,
+  `DepartureTime` DATETIME NOT NULL,
+  `ArrivalTime` DATETIME NOT NULL,
+  `Duration` TIME NOT NULL,
+  `DistanceInMiles` INT(11) NOT NULL,
+  `DepartureAirportId` INT(11) NOT NULL,
+  `ArrivalAirportId` INT(11) NOT NULL,
+  `AirlineId` INT(11) NOT NULL,
+  PRIMARY KEY (`Id`),
+  INDEX `fk_Flights_Airports_idx` (`DepartureAirportId` ASC) VISIBLE,
+  INDEX `fk_Flights_Airports1_idx` (`ArrivalAirportId` ASC) VISIBLE,
+  INDEX `fk_Flights_Airlines1_idx` (`AirlineId` ASC) VISIBLE,
+  CONSTRAINT `fk_Flights_Airlines1`
+    FOREIGN KEY (`AirlineId`)
+    REFERENCES `flightbookingsystem`.`airlines` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Flights_Airports`
+    FOREIGN KEY (`DepartureAirportId`)
+    REFERENCES `flightbookingsystem`.`airports` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_Flights_Airports1`
+    FOREIGN KEY (`ArrivalAirportId`)
+    REFERENCES `flightbookingsystem`.`airports` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`passengers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`passengers` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `FirstName` VARCHAR(45) NOT NULL,
+  `LastName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `flightbookingsystem`.`ticketbooking`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `flightbookingsystem`.`ticketbooking` (
+  `Id` INT(11) NOT NULL AUTO_INCREMENT,
+  `Number` VARCHAR(100) NOT NULL,
+  `Price` INT(11) NOT NULL,
+  `PassengerId` INT(11) NOT NULL,
+  `FlightId` INT(11) NOT NULL,
+  `FlightClasseId` INT(11) NOT NULL,
+  PRIMARY KEY (`Id`),
+  INDEX `fk_TicketBooking_Passengers1_idx` (`PassengerId` ASC) VISIBLE,
+  INDEX `fk_TicketBooking_Flights1_idx` (`FlightId` ASC) VISIBLE,
+  INDEX `fk_TicketBooking_FlightClasses1_idx` (`FlightClasseId` ASC) VISIBLE,
+  CONSTRAINT `fk_TicketBooking_FlightClasses1`
+    FOREIGN KEY (`FlightClasseId`)
+    REFERENCES `flightbookingsystem`.`flightclasses` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_TicketBooking_Flights1`
+    FOREIGN KEY (`FlightId`)
+    REFERENCES `flightbookingsystem`.`flights` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_TicketBooking_Passengers1`
+    FOREIGN KEY (`PassengerId`)
+    REFERENCES `flightbookingsystem`.`passengers` (`Id`)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
